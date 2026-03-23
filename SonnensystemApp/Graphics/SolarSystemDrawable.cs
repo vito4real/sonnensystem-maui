@@ -1,35 +1,27 @@
-﻿using Microsoft.Maui.Graphics;
+﻿using CosineKitty;
+using Microsoft.Maui.Graphics;
 using SonnensystemApp.Models;
 
 namespace SonnensystemApp.Graphics
 {
     public class SolarSystemDrawable : IDrawable
     {
-        private readonly List<(float X, float Y, float Size)> _stars;
-
         public List<PlanetPosition> Planets { get; set; } = new();
 
         public DateTime CurrentTimeUtc { get; set; } = DateTime.UtcNow;
 
+        public float Zoom { get; set; } = 1.0f;
+
+        public float OffsetX { get; set; } = 0f;
+        public float OffsetY { get; set; } = 0f;
+
         public SolarSystemDrawable()
         {
-            var random = new Random(42);
-            _stars = new List<(float X, float Y, float Size)>();
-
-            for (int i = 0; i < 120; i++)
-            {
-                _stars.Add((
-                    X: random.Next(0, 1000),
-                    Y: random.Next(0, 1000),
-                    Size: random.Next(1, 3)
-                ));
-            }
         }
 
         public void Draw(ICanvas canvas, RectF dirtyRect)
         {
             DrawBackground(canvas, dirtyRect);
-            DrawStars(canvas, dirtyRect);
             DrawTitle(canvas, dirtyRect);
             DrawSolarSystem(canvas, dirtyRect);
         }
@@ -38,18 +30,6 @@ namespace SonnensystemApp.Graphics
         {
             canvas.FillColor = Color.FromArgb("#050816");
             canvas.FillRectangle(dirtyRect);
-        }
-
-        private void DrawStars(ICanvas canvas, RectF dirtyRect)
-        {
-            canvas.FillColor = Colors.White;
-
-            foreach (var star in _stars)
-            {
-                float x = star.X / 1000f * dirtyRect.Width;
-                float y = star.Y / 1000f * dirtyRect.Height;
-                canvas.FillCircle(x, y, star.Size);
-            }
         }
 
         private void DrawTitle(ICanvas canvas, RectF dirtyRect)
@@ -79,8 +59,8 @@ namespace SonnensystemApp.Graphics
 
         private void DrawSolarSystem(ICanvas canvas, RectF dirtyRect)
         {
-            float centerX = dirtyRect.Center.X;
-            float centerY = dirtyRect.Center.Y + 30;
+            float centerX = dirtyRect.Center.X + OffsetX;
+            float centerY = dirtyRect.Center.Y + 30 + OffsetY;
 
             DrawOrbits(canvas, centerX, centerY);
             DrawSun(canvas, centerX, centerY);
@@ -94,7 +74,20 @@ namespace SonnensystemApp.Graphics
 
             foreach (var planet in Planets)
             {
-                canvas.DrawCircle(centerX, centerY, (float)planet.OrbitRadius);
+                var orbitPoints = BuildOrbitPoints(planet, CurrentTimeUtc);
+
+                for (int i = 1; i < orbitPoints.Count; i++)
+                {
+                    var p1 = orbitPoints[i - 1];
+                    var p2 = orbitPoints[i];
+
+                    canvas.DrawLine(
+                        centerX + p1.X,
+                        centerY + p1.Y,
+                        centerX + p2.X,
+                        centerY + p2.Y
+                    );
+                }
             }
         }
 
@@ -112,8 +105,8 @@ namespace SonnensystemApp.Graphics
         {
             foreach (var planet in Planets)
             {
-                float x = centerX + (float)planet.X;
-                float y = centerY + (float)planet.Y;
+                float x = centerX + (float)(planet.X * Zoom);
+                float y = centerY + (float)(planet.Y * Zoom);
 
                 canvas.FillColor = planet.Color;
                 canvas.FillCircle(x, y, (float)planet.Radius);
@@ -129,6 +122,59 @@ namespace SonnensystemApp.Graphics
                     HorizontalAlignment.Left,
                     VerticalAlignment.Center);
             }
+        }
+
+        private List<PointF> BuildOrbitPoints(PlanetPosition planet, DateTime centerTime)
+        {
+            var points = new List<PointF>();
+
+            int steps = 200;
+
+            // период в днях (примерно)
+            double periodDays = planet.Name switch
+            {
+                "Mercury" => 88,
+                "Venus" => 225,
+                "Earth" => 365,
+                "Mars" => 687,
+                "Jupiter" => 4333,
+                "Saturn" => 10759,
+                "Uranus" => 30687,
+                "Neptune" => 60190,
+                _ => 365
+            };
+
+            var halfPeriod = TimeSpan.FromDays(periodDays / 2);
+
+            for (int i = 0; i < steps; i++)
+            {
+                double t = (double)i / (steps - 1);
+
+                var time = centerTime - halfPeriod + TimeSpan.FromDays(periodDays * t);
+
+                // map planet name to CosineKitty.Body
+                var body = planet.Name switch
+                {
+                    "Mercury" => Body.Mercury,
+                    "Venus" => Body.Venus,
+                    "Earth" => Body.Earth,
+                    "Mars" => Body.Mars,
+                    "Jupiter" => Body.Jupiter,
+                    "Saturn" => Body.Saturn,
+                    "Uranus" => Body.Uranus,
+                    "Neptune" => Body.Neptune,
+                    _ => Body.Earth
+                };
+
+                var vec = Astronomy.HelioVector(body, new AstroTime(time));
+
+                float x = (float)(vec.x * Zoom * 170);
+                float y = (float)(vec.y * Zoom * 170);
+
+                points.Add(new PointF(x, y));
+            }
+
+            return points;
         }
     }
 }
