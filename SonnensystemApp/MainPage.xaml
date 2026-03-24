@@ -42,18 +42,13 @@
                             BackgroundColor="#4F46E5"
                             TextColor="White" />
 
-                    <Button Text="10x"
-                            Clicked="Speed10x"
+                    <Button Text="500K x"
+                            Clicked="Speed500Kx"
                             BackgroundColor="#4F46E5"
                             TextColor="White" />
 
-                    <Button Text="100x"
-                            Clicked="Speed100x"
-                            BackgroundColor="#4F46E5"
-                            TextColor="White" />
-
-                    <Button Text="1000x"
-                            Clicked="Speed1000x"
+                    <Button Text="1М x"
+                            Clicked="Speed1Мx"
                             BackgroundColor="#4F46E5"
                             TextColor="White" />
 
@@ -61,6 +56,18 @@
                             Clicked="SpeedMega"
                             BackgroundColor="#4F46E5"
                             TextColor="White" />
+
+                    <Button Text="🛸 Sind wir allein im Universum?"
+                            Clicked="OnAlienQuestionClicked"
+                            HorizontalOptions="End"
+                            VerticalOptions="End"
+                            Margin="0,0,24,24"
+                            Padding="18,10"
+                            BackgroundColor="#AA4F46E5"
+                            TextColor="White"
+                            CornerRadius="12"
+                            FontSize="14"
+                            ZIndex="10" />
                 </HorizontalStackLayout>
 
             </Grid>

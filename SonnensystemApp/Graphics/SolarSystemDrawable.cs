@@ -20,6 +20,12 @@ namespace SonnensystemApp.Graphics
         public float OffsetX { get; set; } = 0f;
         public float OffsetY { get; set; } = 0f;
 
+        public bool IsUfoVisible { get; set; }
+        public float UfoX { get; set; }
+        public float UfoY { get; set; }
+
+        public RectF LastDirtyRect { get; private set; }
+
         public SolarSystemDrawable()
         {
             var random = new Random(42);
@@ -37,10 +43,13 @@ namespace SonnensystemApp.Graphics
 
         public void Draw(ICanvas canvas, RectF dirtyRect)
         {
+            LastDirtyRect = dirtyRect;
+
             DrawBackground(canvas, dirtyRect);
             DrawStars(canvas, dirtyRect);
             DrawTitle(canvas, dirtyRect);
             DrawSolarSystem(canvas, dirtyRect);
+            DrawUfo(canvas);
         }
 
         private void DrawBackground(ICanvas canvas, RectF dirtyRect)
@@ -215,6 +224,22 @@ namespace SonnensystemApp.Graphics
             }
 
             return points;
+        }
+
+        private void DrawUfo(ICanvas canvas)
+        {
+            if (!IsUfoVisible)
+                return;
+
+            canvas.FillColor = Colors.Silver;
+            canvas.FillEllipse(UfoX - 18, UfoY - 6, 36, 12);
+
+            canvas.FillColor = Colors.LightBlue;
+            canvas.FillEllipse(UfoX - 8, UfoY - 14, 16, 10);
+
+            canvas.StrokeColor = Colors.White;
+            canvas.StrokeSize = 1;
+            canvas.DrawEllipse(UfoX - 18, UfoY - 6, 36, 12);
         }
     }
 }

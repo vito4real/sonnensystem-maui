@@ -18,6 +18,9 @@ namespace SonnensystemApp
 
         private double _timeSpeed = 1.0; // 1x, 10x, 100x...
 
+        private bool _ufoAnimationRunning = false;
+        private double _ufoProgress = 0;
+
 #if WINDOWS
         private bool _isDragging = false;
         private Windows.Foundation.Point _lastPointerPosition;
@@ -42,19 +45,14 @@ namespace SonnensystemApp
             _timeSpeed = 1;
         }
 
-        private void Speed10x(object sender, EventArgs e)
+        private void Speed500Kx(object sender, EventArgs e)
         {
-            _timeSpeed = 10;
+            _timeSpeed = 500_000;
         }
 
-        private void Speed100x(object sender, EventArgs e)
+        private void Speed1Мx(object sender, EventArgs e)
         {
-            _timeSpeed = 100;
-        }
-
-        private void Speed1000x(object sender, EventArgs e)
-        {
-            _timeSpeed = 1000;
+            _timeSpeed = 1_000_000;
         }
 
         private void SpeedMega(object sender, EventArgs e)
@@ -148,5 +146,57 @@ namespace SonnensystemApp
             ((UIElement)sender).ReleasePointerCapture(e.Pointer);
         }
 #endif
+        private void OnAlienQuestionClicked(object sender, EventArgs e)
+        {
+            if (_ufoAnimationRunning)
+                return;
+
+            StartUfoFlyBy();
+        }
+
+        private void StartUfoFlyBy()
+        {
+            _ufoAnimationRunning = true;
+            _ufoProgress = 0;
+
+            var width = _drawable.LastDirtyRect.Width;
+            var height = _drawable.LastDirtyRect.Height;
+
+            Dispatcher.StartTimer(TimeSpan.FromMilliseconds(16), () =>
+            {
+                if (!_ufoAnimationRunning)
+                    return false;
+
+                _ufoProgress += 0.015;
+
+                if (_ufoProgress >= 1.0)
+                {
+                    _drawable.IsUfoVisible = false;
+                    _ufoAnimationRunning = false;
+                    SolarSystemCanvas.Invalidate();
+                    return false;
+                }
+
+                // ✨ ПАРАМЕТРИЧЕСКАЯ ТРАЕКТОРИЯ (дуга)
+
+                double t = _ufoProgress;
+
+                // X: слева → вправо
+                float x = (float)(-100 + t * (width + 200));
+
+                // Y: красивая дуга (парабола)
+                float y = (float)(
+                    height * 0.6
+                    - 150 * Math.Sin(t * Math.PI)
+                );
+
+                _drawable.UfoX = x;
+                _drawable.UfoY = y;
+                _drawable.IsUfoVisible = true;
+
+                SolarSystemCanvas.Invalidate();
+                return true;
+            });
+        }
     }
 }
