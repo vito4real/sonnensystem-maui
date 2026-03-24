@@ -2,6 +2,8 @@
 
 Eine moderne Desktop-Anwendung zur Visualisierung des Sonnensystems in Echtzeit, entwickelt mit .NET MAUI.
 
+![SonnensystemApp](assets/Screenshot_1.png)
+
 ## 🛸 Projektbeschreibung
 
 Die **SonnensystemApp** stellt die Planeten unseres Sonnensystems in einer interaktiven 2D-Visualisierung dar.  
