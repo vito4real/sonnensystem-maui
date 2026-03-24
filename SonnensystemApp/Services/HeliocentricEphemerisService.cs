@@ -13,14 +13,14 @@ namespace SonnensystemApp.Services
 
             return new List<PlanetPosition>
             {
-                CreatePlanet(Body.Mercury, "Mercury", 4, Colors.LightGray, time),
+                CreatePlanet(Body.Mercury, "Merkur", 4, Colors.LightGray, time),
                 CreatePlanet(Body.Venus,   "Venus",   5, Colors.Orange, time),
-                CreatePlanet(Body.Earth,   "Earth",   6, Colors.DeepSkyBlue, time),
+                CreatePlanet(Body.Earth,   "Erde",   6, Colors.DeepSkyBlue, time),
                 CreatePlanet(Body.Mars,    "Mars",    5, Colors.IndianRed, time),
                 CreatePlanet(Body.Jupiter, "Jupiter", 9, Colors.BurlyWood, time),
                 CreatePlanet(Body.Saturn,  "Saturn",  8, Colors.Khaki, time),
                 CreatePlanet(Body.Uranus,  "Uranus",  7, Colors.LightBlue, time),
-                CreatePlanet(Body.Neptune, "Neptune", 7, Colors.CornflowerBlue, time)
+                CreatePlanet(Body.Neptune, "Neptun", 7, Colors.CornflowerBlue, time)
             };
         }
 

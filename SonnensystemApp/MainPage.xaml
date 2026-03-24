@@ -5,32 +5,71 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     BackgroundColor="#050816">
 
-    <Grid RowDefinitions="Auto,*" Padding="12">
-        <VerticalStackLayout Spacing="4">
-            <Label Text="Sonnensystem App"
-                   FontSize="28"
-                   FontAttributes="Bold"
-                   TextColor="White" />
+    <Grid RowDefinitions="Auto,*">
 
-            <Label Text="Vereinfachte Echtzeit-Visualisierung der Planeten"
-                   FontSize="14"
-                   TextColor="#B8C0D9" />
-        </VerticalStackLayout>
+        <!-- Top panel -->
+        <Border
+            Grid.Row="0"
+            BackgroundColor="transparent"
+            StrokeThickness="0"
+            Padding="16,14,16,12">
 
-        <HorizontalStackLayout Spacing="8" Margin="0,10,0,0">
+            <Grid ColumnDefinitions="*,Auto"
+                  ColumnSpacing="24">
 
-            <Button Text="1x" Clicked="Speed1x"/>
-            <Button Text="10x" Clicked="Speed10x"/>
-            <Button Text="100x" Clicked="Speed100x"/>
-            <Button Text="1000x" Clicked="Speed1000x"/>
-            <Button Text="10M x" Clicked="SpeedMega"/>
+                <!-- Left side -->
+                <VerticalStackLayout Grid.Column="0"
+                                     Spacing="2"
+                                     VerticalOptions="Center">
+                    <Label Text="Sonnensystem App"
+                           FontSize="28"
+                           FontAttributes="Bold"
+                           TextColor="White" />
 
-        </HorizontalStackLayout>
+                    <Label Text="Echtzeit-Visualisierung der Planeten"
+                           FontSize="14"
+                           TextColor="#B8C0D9" />
+                </VerticalStackLayout>
 
+                <!-- Right side -->
+                <HorizontalStackLayout Grid.Column="1"
+                                       Spacing="8"
+                                       HorizontalOptions="End"
+                                       VerticalOptions="Center">
+
+                    <Button Text="1x"
+                            Clicked="Speed1x"
+                            BackgroundColor="#4F46E5"
+                            TextColor="White" />
+
+                    <Button Text="10x"
+                            Clicked="Speed10x"
+                            BackgroundColor="#4F46E5"
+                            TextColor="White" />
+
+                    <Button Text="100x"
+                            Clicked="Speed100x"
+                            BackgroundColor="#4F46E5"
+                            TextColor="White" />
+
+                    <Button Text="1000x"
+                            Clicked="Speed1000x"
+                            BackgroundColor="#4F46E5"
+                            TextColor="White" />
+
+                    <Button Text="10M x"
+                            Clicked="SpeedMega"
+                            BackgroundColor="#4F46E5"
+                            TextColor="White" />
+                </HorizontalStackLayout>
+
+            </Grid>
+        </Border>
+
+        <!-- Canvas -->
         <GraphicsView
             x:Name="SolarSystemCanvas"
             Grid.Row="1"
-            Margin="0,16,0,0"
             HorizontalOptions="Fill"
             VerticalOptions="Fill" />
     </Grid>

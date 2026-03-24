@@ -6,6 +6,11 @@ namespace SonnensystemApp.Graphics
 {
     public class SolarSystemDrawable : IDrawable
     {
+        private readonly List<(float X, float Y, float Size)> _stars;
+
+        private const float SunRadius = 14f;
+        private const float StarParallaxFactor = 0.2f;
+
         public List<PlanetPosition> Planets { get; set; } = new();
 
         public DateTime CurrentTimeUtc { get; set; } = DateTime.UtcNow;
@@ -17,11 +22,23 @@ namespace SonnensystemApp.Graphics
 
         public SolarSystemDrawable()
         {
+            var random = new Random(42);
+            _stars = new List<(float X, float Y, float Size)>();
+
+            for (int i = 0; i < 140; i++)
+            {
+                _stars.Add((
+                    X: random.Next(0, 1000),
+                    Y: random.Next(0, 1000),
+                    Size: random.Next(1, 3)
+                ));
+            }
         }
 
         public void Draw(ICanvas canvas, RectF dirtyRect)
         {
             DrawBackground(canvas, dirtyRect);
+            DrawStars(canvas, dirtyRect);
             DrawTitle(canvas, dirtyRect);
             DrawSolarSystem(canvas, dirtyRect);
         }
@@ -30,6 +47,30 @@ namespace SonnensystemApp.Graphics
         {
             canvas.FillColor = Color.FromArgb("#050816");
             canvas.FillRectangle(dirtyRect);
+        }
+
+        private void DrawStars(ICanvas canvas, RectF dirtyRect)
+        {
+            canvas.FillColor = Colors.White;
+
+            float parallaxX = OffsetX * StarParallaxFactor;
+            float parallaxY = OffsetY * StarParallaxFactor;
+
+            foreach (var star in _stars)
+            {
+                float baseX = star.X / 1000f * dirtyRect.Width;
+                float baseY = star.Y / 1000f * dirtyRect.Height;
+
+                float x = baseX + parallaxX;
+                float y = baseY + parallaxY;
+
+                if (x < -5) x += dirtyRect.Width + 10;
+                if (x > dirtyRect.Width + 5) x -= dirtyRect.Width + 10;
+                if (y < -5) y += dirtyRect.Height + 10;
+                if (y > dirtyRect.Height + 5) y -= dirtyRect.Height + 10;
+
+                canvas.FillCircle(x, y, star.Size);
+            }
         }
 
         private void DrawTitle(ICanvas canvas, RectF dirtyRect)
@@ -94,11 +135,11 @@ namespace SonnensystemApp.Graphics
         private void DrawSun(ICanvas canvas, float centerX, float centerY)
         {
             canvas.FillColor = Colors.Gold;
-            canvas.FillCircle(centerX, centerY, 16);
+            canvas.FillCircle(centerX, centerY, SunRadius);
 
             canvas.StrokeColor = Colors.Orange;
             canvas.StrokeSize = 2;
-            canvas.DrawCircle(centerX, centerY, 20);
+            canvas.DrawCircle(centerX, centerY, SunRadius + 4);
         }
 
         private void DrawPlanets(ICanvas canvas, float centerX, float centerY)
@@ -130,17 +171,17 @@ namespace SonnensystemApp.Graphics
 
             int steps = 200;
 
-            // период в днях (примерно)
+            // Umlaufzeit in Tagen (Jahresdauer)
             double periodDays = planet.Name switch
             {
-                "Mercury" => 88,
+                "Merkur" => 88,
                 "Venus" => 225,
-                "Earth" => 365,
+                "Erde" => 365,
                 "Mars" => 687,
                 "Jupiter" => 4333,
                 "Saturn" => 10759,
                 "Uranus" => 30687,
-                "Neptune" => 60190,
+                "Neptun" => 60190,
                 _ => 365
             };
 
@@ -149,20 +190,19 @@ namespace SonnensystemApp.Graphics
             for (int i = 0; i < steps; i++)
             {
                 double t = (double)i / (steps - 1);
-
                 var time = centerTime - halfPeriod + TimeSpan.FromDays(periodDays * t);
 
-                // map planet name to CosineKitty.Body
+                // Mapping deutscher Name -> Astronomy Body
                 var body = planet.Name switch
                 {
-                    "Mercury" => Body.Mercury,
+                    "Merkur" => Body.Mercury,
                     "Venus" => Body.Venus,
-                    "Earth" => Body.Earth,
+                    "Erde" => Body.Earth,
                     "Mars" => Body.Mars,
                     "Jupiter" => Body.Jupiter,
                     "Saturn" => Body.Saturn,
                     "Uranus" => Body.Uranus,
-                    "Neptune" => Body.Neptune,
+                    "Neptun" => Body.Neptune,
                     _ => Body.Earth
                 };
 
